@@ -1,50 +1,84 @@
-#     SNPeBoT2: SNPeBoT2 to be deployed as a downloadable Package      
+# SNPeBoT2
 
-## Installation instructions:
-1) download this repository
-2) install ModCRElib within the SNPeBoT2 folder (follow ModCRElib installation instructions from https://github.com/structuralbioinformatics/ModCRElib)
-	- In the current directory you will have a folder labeled ModCRElib that contains everything from the github) 
-	- Ensure all ModCRElib dependencies are met
-3) in the AssociationFilter folder download and decompress the following:
-	- https://cdn.netbiol.org/tflink/download_files/TFLink_Homo_sapiens_interactions_All_simpleFormat_v1.0.tsv.gz
-	- https://mitra.stanford.edu/engreitz/oak/public/Nasser2021/AllPredictions.AvgHiC.ABC0.015.minus150.ForABCPaperV3.txt.gz
+SNPeBoT2 is a downloadable package for predicting the effect of SNPs on transcription factor binding and disease association.
 
-## Running SNPeBoT2
-Predict_SNP_effect.sh:
-	This is the bash script that will generate ASB predictions on a list of reference and alternate sequence for a given Transcription Factor
-	It takes an input of: 
-		1) TF name: This is the name or id of the transcription factor, it should match the id or name used in 3 and 4
-		2) job id: A unique job id that will be used to designate output folder names 
-		3) ASB file location: The path to the file containing the SNPs to be tested.
-			- file has 4 columns per SNP: 1) TF name 
-			                              2) reference sequence (51 nt long with mutation position at 26) 
-			                              3) alternate sequence (51 nt long with mutation position at 26) 
-			                              4) SNP id (suggest {chr}-{position}-{ref allele}-{alt allele}-{TF name}
-FIGLA   GGATTTATCCATGTTTTTGCATGTAGAGATGGCTTGAAAAACAAACTATAT     GGATTTATCCATGTTTTTGCATGTACAGATGGCTTGAAAAACAAACTATAT     chr7-133924858-G-C-FIGLA 
-		4) model of TF bound to DNA: This can be generated either with ModCRElib or another tool 
-		5) id of template used in model: If ModCRElib was used this can be found in the model file name otherwise this must be designated "general".
-	The models which must be submitted by the user will be stored automatically in Output_{job id}/models_{job id}
-	The prediction of the effect on the binding of the TF that each SNP will have are stored in Output_{job id}/Predictions_{job id}.tsv 
-	
+---
 
-RunAssoc.sh:
-	This is the script that will predict if the SNP is associated with a disease.
-	It takes an input of:
-		1) TF name: Use uniprot id of the transcription factor
-		2) Chrom: the chromosome the SNP is located on 
-		3) Prediction: the prediction given by Predict_SNP_effect.sh (gain,loss,no-change)
-		4) Position: The position of the SNP
-		5) jobid: The job id submitted in Predict_SNP_effect.sh
-		6) assembly: The human genome assembly used for the SNP location
-		7) SNPId: The id for the SNP (as used in Predict_SNP_effect.sh)
-	The output will be stored in Output_$jobid/associations/assoc_$SNPId.csv
+## Table of Contents
 
+- [Installation](#installation)
+- [Usage](#usage)
+  - [Predict SNP Effect](#predict_snp_effectsh)
+  - [Run Association Analysis](#runassocsh)
 
+---
 
+## Installation
 
-	disgenet/all_gene_disease_pmid_associations.tsv.gz
+1. **Download this repository**
 
+2. **Install ModCRElib** inside the SNPeBoT2 folder by following the instructions at:
+   [https://github.com/structuralbioinformatics/ModCRElib](https://github.com/structuralbioinformatics/ModCRElib)
+   - After installation, a `ModCRElib/` folder containing all necessary files should be present in the current directory
+   - Ensure all ModCRElib dependencies are met
 
-regulator info from:
-	https://ftp.ebi.ac.uk/pub/databases/spot/eQTL/susie/QTS000025/QTD000434/QTD000434.credible_sets.tsv.gz
+3. **Download required data files** into the `AssociationFilter/` folder and decompress them:
+   - [TFLink_Homo_sapiens_interactions_All_simpleFormat_v1.0.tsv.gz](https://cdn.netbiol.org/tflink/download_files/TFLink_Homo_sapiens_interactions_All_simpleFormat_v1.0.tsv.gz)
+   - [AllPredictions.AvgHiC.ABC0.015.minus150.ForABCPaperV3.txt.gz](https://mitra.stanford.edu/engreitz/oak/public/Nasser2021/AllPredictions.AvgHiC.ABC0.015.minus150.ForABCPaperV3.txt.gz)
 
+---
+
+## Usage
+
+### `Predict_SNP_effect.sh`
+
+Generates allele-specific binding (ASB) predictions for a list of reference and alternate sequences for a given transcription factor.
+
+**Arguments:**
+
+| # | Argument | Description |
+|---|----------|-------------|
+| 1 | `TF name` | Name or ID of the transcription factor (should match the ID used in arguments 3 and 4) |
+| 2 | `job_id` | A unique job ID used to name output folders |
+| 3 | `ASB file path` | Path to the file containing the SNPs to be tested (see format below) |
+| 4 | `TF model` | Path to the model of the TF bound to DNA (can be generated with ModCRElib or another tool) |
+| 5 | `template ID` | ID of the template used in the model. If ModCRElib was used, this can be found in the model filename. Otherwise, use `general` |
+
+**ASB input file format** (4 columns per SNP, tab-separated):
+
+| Column | Description |
+|--------|-------------|
+| 1 | TF name |
+| 2 | Reference sequence (51 nt, mutation at position 26) |
+| 3 | Alternate sequence (51 nt, mutation at position 26) |
+| 4 | SNP ID (recommended format: `{chr}-{position}-{ref allele}-{alt allele}-{TF name}`) |
+
+Example row:
+```
+FIGLA   GGATTTATCCATGTTTTTGCATGTAGAGATGGCTTGAAAAACAAACTATAT   GGATTTATCCATGTTTTTGCATGTACAGATGGCTTGAAAAACAAACTATAT   chr7-133924858-G-C-FIGLA
+```
+
+**Output:**
+- Models submitted by the user are stored in `Output_{job_id}/models_{job_id}/`
+- SNP binding effect predictions are stored in `Output_{job_id}/Predictions_{job_id}.tsv`
+
+---
+
+### `RunAssoc.sh`
+
+Predicts whether a SNP is associated with a disease, based on the output of `Predict_SNP_effect.sh`.
+
+**Arguments:**
+
+| # | Argument | Description |
+|---|----------|-------------|
+| 1 | `TF name` | UniProt ID of the transcription factor |
+| 2 | `Chrom` | Chromosome on which the SNP is located |
+| 3 | `Prediction` | Predicted binding effect from `Predict_SNP_effect.sh` (`gain`, `loss`, or `no-change`) |
+| 4 | `Position` | Genomic position of the SNP |
+| 5 | `job_id` | The job ID used in `Predict_SNP_effect.sh` |
+| 6 | `Assembly` | Human genome assembly used for the SNP location (e.g. `hg38`) |
+| 7 | `SNP ID` | The SNP ID as used in `Predict_SNP_effect.sh` |
+
+**Output:**
+- Results are stored in `Output_{job_id}/associations/assoc_{SNP_ID}.csv`
