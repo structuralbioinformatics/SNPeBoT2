@@ -25,8 +25,7 @@ SNPeBoT2 is a downloadable package for predicting the effect of SNPs on transcri
 3. **Download required data files** into the `AssociationFilter/` folder and decompress them:
    - [TFLink_Homo_sapiens_interactions_All_simpleFormat_v1.0.tsv.gz](https://cdn.netbiol.org/tflink/download_files/TFLink_Homo_sapiens_interactions_All_simpleFormat_v1.0.tsv.gz)
    - [AllPredictions.AvgHiC.ABC0.015.minus150.ForABCPaperV3.txt.gz](https://mitra.stanford.edu/engreitz/oak/public/Nasser2021/AllPredictions.AvgHiC.ABC0.015.minus150.ForABCPaperV3.txt.gz)
-   **Store the following in AssociationFilter/disgenet/**
-   - [disgenet/all_gene_disease_pmid_associations.tsv.gz](https://www.disgenet.org) **An account is required to access disgenet (Free for academic purposes)**
+   - [disgenet/all_gene_disease_pmid_associations.tsv.gz](https://www.disgenet.org) **Store in AssociationFilter/disgenet/, An account is required to access disgenet (Free for academic purposes)**
 
 ---
 
